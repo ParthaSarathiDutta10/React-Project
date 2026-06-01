@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-
+//step
 const messages = [
     "Learn React ⚛️",
     "Apply for jobs 💼",
@@ -13,6 +13,7 @@ export default function App(){
     </>
   )
 }
+
 
 function Step(){
 
