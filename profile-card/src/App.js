@@ -11,7 +11,7 @@ const skills=[
   },
   {
     skill:"Web Developer",
-    level:"advanced",
+    level:"intermediate",
     color:"#54af09"
   },
   {
@@ -28,6 +28,11 @@ const skills=[
     skill:"Node JS",
     level:"intermediate",
     color:"#d206a6"
+  },
+  {
+    skill:"Docker",
+    level:"beginner",
+    color:"#558cec"
   },
 ]
 function App() {
@@ -64,7 +69,14 @@ function Container(){
 function Tools({skill}){
       return(
         <>
-          <span style={{background: skill.color,color: "black", padding:"2px", margin:"4px",display:"inline-block"}} >{skill.skill}</span>
+          <span style={{background: skill.color,color: "black", padding:"2px", margin:"4px",display:"inline-block"}} >
+            {skill.skill}
+            <span style={{margin:"4px"}} >
+              {skill.level === "beginner" && "👶"}
+              {skill.level === "advanced" && "💪"}
+              {skill.level === "intermediate" && "👍"}
+            </span>
+          </span>
         </>
       )
 }
