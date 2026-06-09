@@ -1,5 +1,3 @@
-
-
 import { useState } from "react";
 
 export default function App() {
@@ -56,7 +54,7 @@ function Form({onAddItem}){
 
 return (<form className="add-form" onSubmit={(e)=> {handleSubmit(e)}}>
     <h3>What do you need for your trip?</h3>
-    <select name="" value={quantity} onChange={(e) => setDescription(Number(e.target.value))} id="">
+    <select name="" value={quantity} onChange={(e) => setQuntity(Number(e.target.value))} id="">
       {Array.from({length:20} , (_ , i) => i+1).map((num) =>(
           <option value={num} key={num} >{num}</option>
       ) )} 
@@ -71,7 +69,7 @@ return (<form className="add-form" onSubmit={(e)=> {handleSubmit(e)}}>
 
 
 
-function PackingList({items , onDeleteItem ,onToggleItems }){
+function PackingList({items , onDeleteItem , onToggleItems }){
   return (
     <div className="list">
         <ul>
@@ -114,6 +112,8 @@ function Stats({items}){
     );
   }
 
+
+  
   const  numItems = items.length;
   const numPacked = items.filter((item) => (item.packed)).length;
   const percentage = Math.round((numPacked / numItems)*100);
