@@ -1,0 +1,35 @@
+                    ======================== 1st step =======================
+
+import { useState } from "react";
+
+export default function App(){
+  const [step , setStep] = useState("start");
+
+  return(
+    <div>
+      {step === 'start' && (
+        <div>
+          <h1>Start Screen</h1>
+          <button onClick={() => setStep("quiz")} >Start Quiz</button>
+        </div>
+      )}
+
+      {step === "quiz" && (
+        <div>
+          <h1>Quiz Screen</h1>
+          <p>Question Will come here later</p>
+
+          <button onClick={() => setStep("result")} >Finish Quiz (temp)</button>
+        </div>
+      )}
+
+      {step === "result" && (
+        <div>
+          <h1>Result Screen</h1>
+
+          <button onClick={() => setStep("start")} >Restart Quiz</button>
+        </div>
+      )}
+    </div>
+  );
+}

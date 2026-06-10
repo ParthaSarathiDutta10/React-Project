@@ -1,0 +1,243 @@
+import { useState } from "react";
+import { questions } from "./data/questions";
+import { personalityTypes } from "./data/personalityTypes";
+
+function App() {
+  // --- STATE VARIABLES ---
+  // 1. step: Controls which screen to show ('start', 'quiz', 'result')
+  const [step, setStep] = useState("start");
+
+  // 2. current: Tracks the current question index (0 to questions.length - 1)
+  const [current, setCurrent] = useState(0);
+
+  // 3. scores: Tracks how many times each personality type was chosen.
+  //    Format: { "Analytical Thinker": 2, "Cautious Observer": 1 }
+  const [scores, setScores] = useState({});
+
+  // 4. history: Stores previous states of { current, scores } so we can support a "Go Back" button!
+  const [history, setHistory] = useState([]);
+
+  // --- DERIVED STATE (Helper values computed from existing state) ---
+  const currentQuestion = questions[current];
+  const progressPercent = ((current + 1) / questions.length) * 100;
+
+  // --- EVENT HANDLERS (Functions that handle user actions) ---
+
+  // Starts the quiz
+  const handleStartQuiz = () => {
+    setStep("quiz");
+  };
+
+  // Handles clicking on an answer option
+  const handleAnswerSelect = (type) => {
+    // 1. Record the current state in history (so the user can navigate back if needed)
+    setHistory([...history, { current, scores }]);
+
+    // 2. Increment score for the selected personality type
+    const updatedScores = {
+      ...scores,
+      [type]: (scores[type] || 0) + 1,
+    };
+    setScores(updatedScores);
+
+    // 3. Advance to the next question or complete the quiz
+    if (current < questions.length - 1) {
+      setCurrent(current + 1);
+    } else {
+      setStep("result");
+    }
+  };
+
+  // Navigates back to the previous question
+  const handleBack = () => {
+    if (history.length > 0) {
+      // Pop the last state from history
+      const previousState = history[history.length - 1];
+      
+      // Restore previous state
+      setCurrent(previousState.current);
+      setScores(previousState.scores);
+      
+      // Update history to remove the last state
+      setHistory(history.slice(0, -1));
+    } else {
+      // If history is empty, go back to start screen
+      setStep("start");
+    }
+  };
+
+  // Resets the entire quiz state to start over
+  const handleRestart = () => {
+    setStep("start");
+    setCurrent(0);
+    setScores({});
+    setHistory([]);
+  };
+
+  // Computes the dominant personality type based on highest score
+  const getDominantType = () => {
+    let maxScore = -1;
+    let dominantType = "";
+
+    Object.entries(scores).forEach(([type, count]) => {
+      if (count > maxScore) {
+        maxScore = count;
+        dominantType = type;
+      }
+    });
+
+    // Default fallback if no score exists (should not happen normally)
+    return dominantType || "Analytical Thinker";
+  };
+
+  const dominantTypeKey = getDominantType();
+  const dominantProfile = personalityTypes[dominantTypeKey];
+
+  return (
+    <div className="relative min-h-screen bg-gradient-to-tr from-slate-950 via-indigo-950 to-slate-900 text-slate-100 font-sans flex flex-col items-center justify-center overflow-x-hidden py-12">
+      {/* Decorative Ambient Background Glows */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      {/* Main Glassmorphic Container Card */}
+      <div className="relative z-10 w-full max-w-xl mx-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 md:p-10 transition-all duration-300">
+        
+        {/* --- SCREEN 1: START SCREEN --- */}
+        {step === "start" && (
+          <div className="text-center animate-fade-in">
+            <div className="inline-block p-4 rounded-full bg-indigo-500/10 border border-indigo-400/20 mb-6 text-5xl">
+              🧠
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent mb-4">
+              Mind Mirror
+            </h1>
+            <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+              Answer 5 simple questions about everyday social scenarios to reveal your dominant cognitive and decision-making style.
+            </p>
+            
+            <button
+              onClick={handleStartQuiz}
+              className="group relative w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-semibold text-lg shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 overflow-hidden cursor-pointer"
+            >
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+              <span className="relative flex items-center justify-center gap-2">
+                Begin Assessment
+                <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* --- SCREEN 2: ACTIVE QUIZ SCREEN --- */}
+        {step === "quiz" && (
+          <div className="animate-fade-in">
+            {/* Header with Navigation and Counter */}
+            <div className="flex items-center justify-between mb-6">
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+              >
+                <span>←</span> Back
+              </button>
+              <span className="text-sm font-semibold tracking-wider text-indigo-400">
+                QUESTION {current + 1} OF {questions.length}
+              </span>
+            </div>
+
+            {/* Custom Animated Progress Bar */}
+            <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mb-8">
+              <div
+                className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              ></div>
+            </div>
+
+            {/* Scenario Card */}
+            <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-6 mb-8">
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-300 mb-2 block">
+                Scenario
+              </span>
+              <h2 className="text-xl md:text-2xl font-bold text-slate-100 leading-snug">
+                {currentQuestion.scenario}
+              </h2>
+            </div>
+
+            {/* Answer Options list */}
+            <div className="flex flex-col gap-4">
+              {currentQuestion.options.map((option, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleAnswerSelect(option.type)}
+                  className="w-full text-left p-5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-400/50 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center justify-between group cursor-pointer"
+                >
+                  <span className="text-slate-300 group-hover:text-white font-medium text-base pr-4">
+                    {option.text}
+                  </span>
+                  <span className="w-6 h-6 rounded-full border border-white/20 group-hover:border-indigo-400 flex items-center justify-center text-xs text-transparent group-hover:text-indigo-400 group-hover:bg-indigo-500/10 transition-all duration-200">
+                    ➔
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* --- SCREEN 3: RESULTS SCREEN --- */}
+        {step === "result" && (
+          <div className="animate-fade-in text-center">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-indigo-400 mb-2">
+              Your Mirror Archetype
+            </h3>
+            
+            <div className="text-6xl my-4 animate-bounce">
+              {dominantProfile.emoji}
+            </div>
+
+            <h1 className={`text-3xl md:text-4xl font-extrabold bg-gradient-to-r ${dominantProfile.gradient} mb-1`}>
+              {dominantProfile.title}
+            </h1>
+            <p className="text-indigo-300 text-sm font-medium tracking-wide mb-6">
+              {dominantProfile.subtitle}
+            </p>
+
+            <p className="text-slate-300 leading-relaxed bg-slate-900/40 border border-white/5 rounded-2xl p-6 mb-6 text-sm md:text-base text-left">
+              {dominantProfile.description}
+            </p>
+
+            {/* Core Traits Badges */}
+            <div className="mb-8">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 block">
+                Key Traits
+              </span>
+              <div className="flex flex-wrap justify-center gap-2">
+                {dominantProfile.traits.map((trait, idx) => (
+                  <span
+                    key={idx}
+                    className="px-4 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 border border-indigo-400/20 text-indigo-300"
+                  >
+                    {trait}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Restart Quiz Button */}
+            <button
+              onClick={handleRestart}
+              className="w-full py-4 px-6 rounded-2xl border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white font-semibold text-lg transition-all duration-200 cursor-pointer"
+            >
+              Retake Quiz
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Footer Info */}
+      <div className="relative z-10 mt-8 text-center text-xs text-slate-500 tracking-wider">
+        MIND MIRROR • AN INTERACTIVE COGNITIVE QUIZ
+      </div>
+    </div>
+  );
+}
+
+export default App;
