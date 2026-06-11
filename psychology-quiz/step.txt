@@ -1,5 +1,6 @@
                     ======================== 1st step =======================
 
+
 import { useState } from "react";
 
 export default function App(){
@@ -33,3 +34,122 @@ export default function App(){
     </div>
   );
 }
+
+
+
+
+          ======================== 2nd step =======================
+
+
+
+
+
+
+
+
+import { useState } from "react";
+import { questions } from "./data/questions";
+export default function App(){
+  const [step , setStep] = useState("start");
+  const [current, setCurrent] = useState(0);
+  const  currentQuestion = questions[current];
+
+  return(
+    <div>
+      {step === 'start' && (
+        <div>
+          <h1>Start Screen</h1>
+          <button onClick={() => setStep("quiz")} >Start Quiz</button>
+        </div>
+      )}
+
+      {step === "quiz" && (
+        <div>
+          <h1>{currentQuestion.scenario}</h1>
+          
+          {currentQuestion.options.map((option, index)=>(
+            <p key={index}> {option.text}</p>
+          ))}
+
+          <button onClick={() => setCurrent(current+1)} >NEXT</button>
+        </div>
+      )}
+
+      {step === "result" && (
+        <div>
+          <h1>Result Screen</h1>
+
+          <button onClick={() => setStep("start")} >Restart Quiz</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+          ======================== 3rd  step =======================
+
+
+
+
+
+
+
+
+
+
+
+import { useState } from "react";
+import { questions } from "./data/questions";
+export default function App(){
+  const [step , setStep] = useState("start");
+  const [current, setCurrent] = useState(0);
+  const  currentQuestion = questions[current];
+
+  function handleNextQuestion(){
+    if(current < questions.length -  1){
+      setCurrent(current+1);
+    }
+    else{
+      setStep("result");
+    }
+  }
+    return(
+    <div>
+      {step === 'start' && (
+        <div>
+          <h1>Start Screen</h1>
+          <button onClick={() => setStep("quiz")} >Start Quiz</button>
+        </div>
+      )}
+
+      {step === "quiz" && (
+        <div>
+          <h3>{currentQuestion.scenario}</h3>
+          
+          {currentQuestion.options.map((option, index)=>(
+            <button className="block" onClick={handleNextQuestion} key={index}> {option.text}</button>
+            
+          ))}
+
+        </div>
+      )}
+
+      {step === "result" && (
+        <div>
+          <h1>Result Screen</h1>
+
+          <button onClick={() => setStep("start")} >Restart Quiz</button>
+        </div>
+      )}
+    </div>
+  );
+}
+

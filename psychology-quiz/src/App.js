@@ -1,11 +1,25 @@
 import { useState } from "react";
-import {question } from "./questions";
+import { questions } from "./data/questions";
 export default function App(){
   const [step , setStep] = useState("start");
-  const [current, setCurrent] = useState("start");
-  const  currentQuestion = question[current];
+  const [current, setCurrent] = useState(0);
+  const [scores, setScores] = useState({});
+  const  currentQuestion = questions[current];
 
-  return(
+  function handleNextQuestion(type){
+    setScores((prev) => ({
+      ...prev , 
+      [type]:(prev[type] || 0)+1,
+    }));
+
+    if(current < questions.length -  1){
+      setCurrent(current+1);
+    }
+    else{
+      setStep("result");
+    }
+  }
+    return(
     <div>
       {step === 'start' && (
         <div>
@@ -16,13 +30,13 @@ export default function App(){
 
       {step === "quiz" && (
         <div>
-          <h1>{currentQuestion.scenario}</h1>
+          <h3>{currentQuestion.scenario}</h3>
           
           {currentQuestion.options.map((option, index)=>(
-            <p key={index}> {option.text}</p>
+            <button className="block" onClick={handleNextQuestion(option.type)} key={index}> {option.text}</button>
+            
           ))}
 
-          <button onClick={() => setCurrent(current+1)} >NEXT</button>
         </div>
       )}
 
@@ -36,3 +50,4 @@ export default function App(){
     </div>
   );
 }
+
