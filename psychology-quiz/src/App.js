@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { questions } from "./data/questions";
+
+
 export default function App(){
   const [step , setStep] = useState("start");
   const [current, setCurrent] = useState(0);
@@ -19,6 +21,22 @@ export default function App(){
       setStep("result");
     }
   }
+
+  const result = getDominantType(scores);
+
+  function getDominantType(scores){
+    let maxScore = -1 ;
+    let dominantType = "";
+    Object.entries(scores).forEach(([type, count]) => {
+      if(count > maxScore){
+        maxScore =count;
+        dominantType = type;
+      }
+    }) ;
+
+    return dominantType;
+
+  }
     return(
     <div>
       {step === 'start' && (
@@ -33,7 +51,7 @@ export default function App(){
           <h3>{currentQuestion.scenario}</h3>
           
           {currentQuestion.options.map((option, index)=>(
-            <button className="block" onClick={handleNextQuestion(option.type)} key={index}> {option.text}</button>
+            <button className="block" onClick={() => handleNextQuestion(option.type)} key={index}> {option.text}</button>
             
           ))}
 
@@ -42,7 +60,8 @@ export default function App(){
 
       {step === "result" && (
         <div>
-          <h1>Result Screen</h1>
+          <h1>Your Personality Type</h1>
+          <h2>{result}</h2>
 
           <button onClick={() => setStep("start")} >Restart Quiz</button>
         </div>
@@ -50,4 +69,5 @@ export default function App(){
     </div>
   );
 }
+
 
